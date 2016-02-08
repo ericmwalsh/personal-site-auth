@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::API
   # before_filter :authenticate_user_from_token!
   # before_filter :authenticate_user!
+  before_filter :check_device_kind
 
   # protected
 
@@ -17,6 +18,12 @@ class ApplicationController < ActionController::API
   # end
 
   protected
+
+  def check_device_kind
+    unless token = request.headers['Device-Kind']
+      return head 401, reason: "Unauthorized user; missing required params."
+    end
+  end
 
   def authenticate_user_from_token!
     authenticated = authenticate_with_http_token do |user_token, options|
