@@ -6,7 +6,7 @@ class SessionsController < Devise::SessionsController
   def create
     self.resource = warden.authenticate!(auth_options)
     sign_in(resource_name, resource)
-    data = self.resource.to_json
+    data = self.resource.to_json({ format: "sign_in" })
     render json: data, status: 201
   rescue
     render json: { error: "Incorrect credentials." }, status: 401
@@ -14,7 +14,7 @@ class SessionsController < Devise::SessionsController
 
   def destroy
     token = request.headers['Auth-Token']
-    if user = Admin.find_by_authentication_token(token)
+    if user = User.find_by_authentication_token(token)
       sign_out user
     else
       render json: { error: "Logout failed; no user found." }, status: 403
@@ -27,8 +27,9 @@ class SessionsController < Devise::SessionsController
 
   def authenticate_via_token
     token = request.headers['Auth-Token']
-    if user = Admin.find_by_authentication_token(token)
-      render json: { success: true }, status: 201
+    if user = User.find_by_authentication_token(token)
+      data = user.to_json({ format: "auth_via_token" })
+      render json: data, status: 201
     else
       return head 403, reason: "Unauthorized authentication - user does not exist."
     end

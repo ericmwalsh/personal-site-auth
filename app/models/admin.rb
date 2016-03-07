@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: admins
+# Table name: users
 #
 #  id                     :integer          not null, primary key
 #  email                  :string           default(""), not null
@@ -19,38 +19,13 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  authentication_token   :string           default(""), not null
+#  type                   :string
 #
 
-class Admin < ActiveRecord::Base
-  # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :trackable, :validatable,
-         :lockable, :timeoutable
+class Admin < User
 
-  before_save :ensure_authentication_token
-
-  def ensure_authentication_token
-    if authentication_token.blank?
-      self.authentication_token = generate_authentication_token
-    end
-  end
-
-  def as_json(options = {})
-    {
-      id: self.id,
-      email: self.email,
-      token: self.authentication_token
-    }
-  end
-
-  private
-
-  def generate_authentication_token
-    loop do
-      token = Devise.friendly_token
-      break token unless Admin.where(authentication_token: token).first
-    end
+  def is_admin?
+    true
   end
 
 end

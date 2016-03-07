@@ -22,10 +22,10 @@
 #  type                   :string
 #
 
-require 'test_helper'
+class Client < User
 
-class AdminTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+  def is_admin?
+    false
+  end
+
 end
